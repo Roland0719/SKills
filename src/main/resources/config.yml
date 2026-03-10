@@ -1,0 +1,26 @@
+death:
+  reward:
+    victim:
+      - "say %player% you died!"
+      - "give %player% minecraft:apple 1"
+    killer:
+      - "say %player% you killed %victim%!"
+      - "give %player% minecraft:gold_ingot 1"
+
+leaderboard:
+  empty-name: "---"
+  empty-value: "0"
+
+update-checker: true
+
+database:
+  type: SQLITE # SQLITE or MYSQL
+  mysql:
+    host: localhost
+    port: 3306
+    database: amethyst
+    username: root
+    password: ""
+  sqlite:
+    file: data.db
+    
