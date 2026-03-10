@@ -1,0 +1,25 @@
+name: SKills
+version: '1.0.0'
+main: org.roland0719.sKills.SKills
+api-version: '1.18'
+softdepend: [PlaceholderAPI]
+
+permissions:
+  skills.reload:
+    default: op
+  skills.reset:
+    default: op
+  skills.resetall:
+    default: op
+  skills.help:
+    default: op
+  skills.stats:
+    default: op
+  skills.update-checker:
+    default: op
+
+commands:
+  skills:
+    description: Main SKills command
+    usage: /skills [reload|help|reset|resetall|stats]
+    aliases: [kills]
