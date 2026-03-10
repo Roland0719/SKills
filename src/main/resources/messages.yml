@@ -1,0 +1,57 @@
+prefix: "&8[#7C33E2ꜱ#7E45ECᴋ#8156F5ɪ#8368FFʟ#8368FFʟ#8368FFꜱ&8] &7»"
+
+death:
+  drowning:
+    actionbar: "&c%player%&f drowned."
+    chat: "&c%player%&f drowned."
+  lava:
+    actionbar: "&c%player%&f tried to swim in lava."
+    chat: "&c%player%&f tried to swim in lava."
+  void:
+    actionbar: "&c%player%&f fell into the void and vanished."
+    chat: "&c%player%&f fell into the void and vanished."
+  fall:
+    actionbar: "&c%player%&f hit the ground too hard."
+    chat: "&c%player%&f hit the ground too hard."
+  mob:
+    actionbar: "&c%player%&f was killed by a &a%mob%."
+    chat: "&c%player%&f was killed by a &a%mob%."
+  killed:
+    actionbar: "&c%player%&f was slain by &a%killer%&f using %weapon%."
+    chat: "&c%player%&f was slain by &a%killer%&f using %weapon%."
+
+help:
+  - " "
+  - "#7C33E2ꜱ#7E45ECᴋ#8156F5ɪ#8368FFʟ#8368FFʟ#8368FFꜱ &fHelp:"
+  - " #7C33E2&l* #8368FF/skills reset <player> #7C33E2→ &fReset a player’s skill statistics."
+  - " #7C33E2&l* #8368FF/skills resetall #7C33E2→ &fReset all players' skill statistics."
+  - " #7C33E2&l* #8368FF/skills set <player> <death/kill> <number> #7C33E2→ &fSet a player’s death or kill count."
+  - " #7C33E2&l* #8368FF/skills stats <player> #7C33E2→ &fView a player’s skill statistics."
+  - " #7C33E2&l* #8368FF/skills reload #7C33E2→ &fReload the plugin’s configuration files."
+  - " "
+
+stats:
+  - "#8368FF%player% &fstats:"
+  - " #7C33E2&l* &fKills: #8368FF%kills%"
+  - " #7C33E2&l* &fDeaths: #8368FF%deaths%"
+  - " #7C33E2&l* &fK/D: #8368FF%kd%"
+
+error:
+  no-permission: "%prefix% &cYou don't have permission for this command."
+  not_console: "%prefix% &cThis command can only be used by players."
+  player-not-found: "%prefix% &cThis player has never played on this server!"
+  usage-set: "%prefix%&cUsage: /skills set <player> <kill|death> <number>"
+  usage-reset: "%prefix% &cUsage: /skills reset <player>"
+  invalid-number: "%prefix% &cThe number cannot be negative or invalid!"
+success:
+  reload: "%prefix% &aPlugin successfully reloaded!"
+  reset:
+    sender: "%prefix% &aYou have reset #8368FF%player%&a's statistics."
+    target: "%prefix% &fYour statistics have been reset by an administrator."
+  resetall:
+    sender: "%prefix% &aYou have reset #8368FFALL&a players' statistics."
+  set:
+    sender: "%prefix% &aYou have set the value of #7C33E2%player% #8368FF%type%&a to #8368FF%value%&a."
+    target: "%prefix% &fAn admin has set your #8368FF%type%&f value to #8368FF%value%&f."
+
+update-checker: "%prefix% &fThere is a #8368FFnew version&f of the plugin available! &7(&fcurrent: #8368FF%current% &7| &flatest: #8368FF%latest%&7)"
