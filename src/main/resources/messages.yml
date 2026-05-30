@@ -17,8 +17,8 @@ death:
     actionbar: "&c%player%&f was killed by a &a%mob%."
     chat: "&c%player%&f was killed by a &a%mob%."
   killed:
-    actionbar: "&c%player%&f was slain by &a%killer%&f using %weapon%."
-    chat: "&c%player%&f was slain by &a%killer%&f using %weapon%."
+    actionbar: "&c%player%&8[&6%player_deaths%&8]&f was slain by &a%killer%&8[&6%killer_kills%&8]&f using %weapon%."
+    chat: "&c%player%&8[&6%player_deaths%&8]&f was slain by &a%killer%&8[&6%killer_kills%&8]&f using %weapon%."
 
 help:
   - " "
