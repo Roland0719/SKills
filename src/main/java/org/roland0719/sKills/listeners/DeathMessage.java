@@ -5,109 +5,123 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.roland0719.sKills.SKills;
 
 public final class DeathMessage implements Listener {
-   private final FileConfiguration messages;
-   private final SKills plugin;
-
-   public DeathMessage(SKills plugin, FileConfiguration messages) {
-      this.plugin = plugin;
-      this.messages = messages;
-   }
-
-   @EventHandler
-   public void onDeath(PlayerDeathEvent e) {
-      Player player = e.getPlayer();
-      this.plugin.getStats().addDeath(player.getUniqueId());
-      EntityDamageEvent var4 = player.getLastDamageCause();
-      if (var4 instanceof EntityDamageByEntityEvent) {
-         label40: {
-            EntityDamageByEntityEvent ev = (EntityDamageByEntityEvent)var4;
+    private FileConfiguration messages;
+    private final SKills plugin;
+    public DeathMessage(SKills plugin, FileConfiguration messages) {
+        this.plugin = plugin;
+        this.messages = messages;
+    }
+    @EventHandler
+    public void onDeath(PlayerDeathEvent e) {
+        Player player = e.getPlayer();
+        plugin.getStats().addDeath(player.getUniqueId());
+        if (player.getLastDamageCause() instanceof EntityDamageByEntityEvent ev) {
             Entity damager = ev.getDamager();
-            String killerName;
-            String killerWeapon;
-            char var10000;
-            if (damager instanceof LivingEntity) {
-               LivingEntity mob = (LivingEntity)damager;
-               if (!(damager instanceof Player)) {
-                  killerName = mob.getType().toString().replace("_", " ").toLowerCase();
-                  var10000 = Character.toUpperCase(killerName.charAt(0));
-                  killerName = var10000 + killerName.substring(1);
-                  String rawMobMsgChat = this.messages.getString("death.mob.chat", "&c%player%&f was killed by a &a%mob%.");
-                  rawMobMsgChat = rawMobMsgChat.replace("%player%", player.getDisplayName()).replace("%mob%", killerName);
-                  e.setDeathMessage(ChatColor.translateAlternateColorCodes('&', rawMobMsgChat));
-                  killerWeapon = this.messages.getString("death.mob.actionbar", "&c%player%&f was killed by a &a%mob%.");
-                  killerWeapon = killerWeapon.replace("%player%", player.getDisplayName()).replace("%mob%", killerName);
-                  player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.translateAlternateColorCodes('&', killerWeapon)));
-                  break label40;
-               }
-            }
+            if (damager instanceof LivingEntity mob && !(damager instanceof Player)) {
+                String mobName = mob.getType().toString().replace("_", " ").toLowerCase();
+                mobName = Character.toUpperCase(mobName.charAt(0)) + mobName.substring(1);
+                String rawMobMsgChat = messages.getString("death.mob.chat", "&c%player%&f was killed by a &a%mob%.");
+                rawMobMsgChat = rawMobMsgChat
+                        .replace("%player%", player.getDisplayName())
+                        .replace("%mob%", mobName);
+                e.setDeathMessage(ChatColor.translateAlternateColorCodes('&', rawMobMsgChat));
+                String rawMobMsgActionbar = messages.getString("death.mob.actionbar", "&c%player%&f was killed by a &a%mob%.");
+                rawMobMsgActionbar = rawMobMsgActionbar
+                        .replace("%player%", player.getDisplayName())
+                        .replace("%mob%", mobName);
+                player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
+                        new TextComponent(ChatColor.translateAlternateColorCodes('&', rawMobMsgActionbar)));
+            } else if (damager instanceof Player killer) {
+                    plugin.getStats().addKill(killer.getUniqueId());
+                    String killerName = killer.getDisplayName();
+                    ItemStack weapon = killer.getInventory().getItemInMainHand();
+                    String killerWeapon = weapon.hasItemMeta() && weapon.getItemMeta().hasDisplayName()
+                            ? weapon.getItemMeta().getDisplayName()
+                            : weapon.getType().toString().replace("_", " ").toLowerCase();
+                    killerWeapon = Character.toUpperCase(killerWeapon.charAt(0)) + killerWeapon.substring(1);
+                    int playerDeaths = plugin.getStats().getDeaths(player.getUniqueId());
+                    int killerKills = plugin.getStats().getKills(killer.getUniqueId());
+                    String rawKilledMsgChat = messages.getString(
+                            "death.killed.chat",
+                            "&c%player%&8[&6%player_deaths%&8]&f was slain by &a%killer%&8[&6%killer_kills%&8]&f using %weapon%."
+                    );
+                    rawKilledMsgChat = rawKilledMsgChat
+                            .replace("%player%", player.getDisplayName())
+                            .replace("%killer%", killerName)
+                            .replace("%weapon%", killerWeapon)
+                            .replace("%player_deaths%", String.valueOf(playerDeaths))
+                            .replace("%killer_kills%", String.valueOf(killerKills));
+                    e.setDeathMessage(ChatColor.translateAlternateColorCodes('&', rawKilledMsgChat));
+                    String rawKilledMsgActionbar = messages.getString(
+                            "death.killed.actionbar",
+                            "&c%player%&8[&6%player_deaths%&8]&f was slain by &a%killer%&8[&6%killer_kills%&8]&f using %weapon%."
+                    );
+                    rawKilledMsgActionbar = rawKilledMsgActionbar
+                            .replace("%player%", player.getDisplayName())
+                            .replace("%killer%", killerName)
+                            .replace("%weapon%", killerWeapon)
+                            .replace("%player_deaths%", String.valueOf(playerDeaths))
+                            .replace("%killer_kills%", String.valueOf(killerKills));
+                    player.spigot().sendMessage(
+                            ChatMessageType.ACTION_BAR,
+                            new TextComponent(ChatColor.translateAlternateColorCodes('&', rawKilledMsgActionbar))
+                    );
+                }
+        } if (player.getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.FALL) {
+            String rawFallMsgChat = messages.getString("death.fall.chat", "&c%player%&f hit the ground too hard.");
+            rawFallMsgChat = rawFallMsgChat
+                    .replace("%player%", player.getDisplayName());
+            e.setDeathMessage(ChatColor.translateAlternateColorCodes('&', rawFallMsgChat));
+            String rawFallMsgActionbar = messages.getString("death.fall.actionbar", "&c%player%&f hit the ground too hard.");
+            rawFallMsgActionbar = rawFallMsgActionbar
+                    .replace("%player%", player.getDisplayName());
+            player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
+                    new TextComponent(ChatColor.translateAlternateColorCodes('&', rawFallMsgActionbar)));
+        } if (player.getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.DROWNING) {
+            String rawDrowningMsgChat = messages.getString("death.drowning.chat", "&c%player%&f drowned.");
+            rawDrowningMsgChat = rawDrowningMsgChat
+                    .replace("%player%", player.getDisplayName());
+            e.setDeathMessage(ChatColor.translateAlternateColorCodes('&', rawDrowningMsgChat));
+            String rawDrowningMsgActionbar = messages.getString("death.drowning.actionbar", "&c%player%&f drowned.");
+            rawDrowningMsgActionbar = rawDrowningMsgActionbar
+                    .replace("%player%", player.getDisplayName());
+            player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
+                    new TextComponent(ChatColor.translateAlternateColorCodes('&', rawDrowningMsgActionbar)));
+        } if (player.getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.LAVA) {
+            String rawLavaMsgChat = messages.getString("death.lava.chat", "&c%player%&f tried to swim in lava.");
+            rawLavaMsgChat = rawLavaMsgChat
+                    .replace("%player%", player.getDisplayName());
+            e.setDeathMessage(ChatColor.translateAlternateColorCodes('&', rawLavaMsgChat));
+            String rawLavaMsgActionbar = messages.getString("death.lava.actionbar", "&c%player%&f tried to swim in lava.");
+            rawLavaMsgActionbar = rawLavaMsgActionbar
+                    .replace("%player%", player.getDisplayName());
+            player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
+                    new TextComponent(ChatColor.translateAlternateColorCodes('&', rawLavaMsgActionbar)));
+        } if (player.getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.VOID) {
+            String rawVoidMsgChat = messages.getString("death.void.chat", "&c%player%&f fell into the void and vanished.");
+            rawVoidMsgChat = rawVoidMsgChat
+                    .replace("%player%", player.getDisplayName());
+            e.setDeathMessage(ChatColor.translateAlternateColorCodes('&', rawVoidMsgChat));
+            String rawVoidMsgActionbar = messages.getString("death.void.actionbar", "&c%player%&f fell into the void and vanished.");
+            rawVoidMsgActionbar = rawVoidMsgActionbar
+                    .replace("%player%", player.getDisplayName());
+            player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
+                    new TextComponent(ChatColor.translateAlternateColorCodes('&', rawVoidMsgActionbar)));
+        }
+    }
 
-            if (damager instanceof Player) {
-               Player killer = (Player)damager;
-               this.plugin.getStats().addKill(killer.getUniqueId());
-               killerName = killer.getDisplayName();
-               ItemStack weapon = killer.getInventory().getItemInMainHand();
-               killerWeapon = weapon.hasItemMeta() && weapon.getItemMeta().hasDisplayName() ? weapon.getItemMeta().getDisplayName() : weapon.getType().toString().replace("_", " ").toLowerCase();
-               var10000 = Character.toUpperCase(killerWeapon.charAt(0));
-               killerWeapon = var10000 + killerWeapon.substring(1);
-               String rawKilledMsgChat = this.messages.getString("death.killed.chat", "&c%player%&f was slain by &a%killer%&f using %weapon%.");
-               rawKilledMsgChat = rawKilledMsgChat.replace("%player%", player.getDisplayName()).replace("%killer%", killerName).replace("%weapon%", killerWeapon);
-               e.setDeathMessage(ChatColor.translateAlternateColorCodes('&', rawKilledMsgChat));
-               String rawKilledMsgActionbar = this.messages.getString("death.killed.actionbar", "&c%player%&f was slain by &a%killer%&f using %weapon%.");
-               rawKilledMsgActionbar = rawKilledMsgActionbar.replace("%player%", player.getDisplayName()).replace("%killer%", killerName).replace("%weapon%", killerWeapon);
-               player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.translateAlternateColorCodes('&', rawKilledMsgActionbar)));
-            }
-         }
-      }
-
-      String rawVoidMsgChat;
-      String rawVoidMsgActionbar;
-      if (player.getLastDamageCause().getCause() == DamageCause.FALL) {
-         rawVoidMsgChat = this.messages.getString("death.fall.chat", "&c%player%&f hit the ground too hard.");
-         rawVoidMsgChat = rawVoidMsgChat.replace("%player%", player.getDisplayName());
-         e.setDeathMessage(ChatColor.translateAlternateColorCodes('&', rawVoidMsgChat));
-         rawVoidMsgActionbar = this.messages.getString("death.fall.actionbar", "&c%player%&f hit the ground too hard.");
-         rawVoidMsgActionbar = rawVoidMsgActionbar.replace("%player%", player.getDisplayName());
-         player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.translateAlternateColorCodes('&', rawVoidMsgActionbar)));
-      }
-
-      if (player.getLastDamageCause().getCause() == DamageCause.DROWNING) {
-         rawVoidMsgChat = this.messages.getString("death.drowning.chat", "&c%player%&f drowned.");
-         rawVoidMsgChat = rawVoidMsgChat.replace("%player%", player.getDisplayName());
-         e.setDeathMessage(ChatColor.translateAlternateColorCodes('&', rawVoidMsgChat));
-         rawVoidMsgActionbar = this.messages.getString("death.drowning.actionbar", "&c%player%&f drowned.");
-         rawVoidMsgActionbar = rawVoidMsgActionbar.replace("%player%", player.getDisplayName());
-         player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.translateAlternateColorCodes('&', rawVoidMsgActionbar)));
-      }
-
-      if (player.getLastDamageCause().getCause() == DamageCause.LAVA) {
-         rawVoidMsgChat = this.messages.getString("death.lava.chat", "&c%player%&f tried to swim in lava.");
-         rawVoidMsgChat = rawVoidMsgChat.replace("%player%", player.getDisplayName());
-         e.setDeathMessage(ChatColor.translateAlternateColorCodes('&', rawVoidMsgChat));
-         rawVoidMsgActionbar = this.messages.getString("death.lava.actionbar", "&c%player%&f tried to swim in lava.");
-         rawVoidMsgActionbar = rawVoidMsgActionbar.replace("%player%", player.getDisplayName());
-         player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.translateAlternateColorCodes('&', rawVoidMsgActionbar)));
-      }
-
-      if (player.getLastDamageCause().getCause() == DamageCause.VOID) {
-         rawVoidMsgChat = this.messages.getString("death.void.chat", "&c%player%&f fell into the void and vanished.");
-         rawVoidMsgChat = rawVoidMsgChat.replace("%player%", player.getDisplayName());
-         e.setDeathMessage(ChatColor.translateAlternateColorCodes('&', rawVoidMsgChat));
-         rawVoidMsgActionbar = this.messages.getString("death.void.actionbar", "&c%player%&f fell into the void and vanished.");
-         rawVoidMsgActionbar = rawVoidMsgActionbar.replace("%player%", player.getDisplayName());
-         player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.translateAlternateColorCodes('&', rawVoidMsgActionbar)));
-      }
-
-   }
+    public void reload(FileConfiguration messages) {
+        this.messages = messages;
+    }
 }
