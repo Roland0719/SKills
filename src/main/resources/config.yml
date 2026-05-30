@@ -1,25 +1,73 @@
-death:
-  reward:
-    victim:
-      - "say %player% you died!"
-      - "give %player% minecraft:apple 1"
-    killer:
-      - "say %player% you killed %victim%!"
-      - "give %player% minecraft:gold_ingot 1"
+# =========================================================
+#                    AMETHYST CONFIG
+# =========================================================
+# Configure rewards, database, leaderboard and other options
+#
+# Placeholders:
+#   %player%  -> player name
+#   %victim%  -> victim name
+# =========================================================
+
+reward:
+
+  victim: # Commands executed for the dead player
+
+    1:
+      range: 0-24 # Kill range required for this reward
+      commands:
+        - "say %player% you died!" # Sends a message
+        - "give %player% minecraft:apple 1" # Gives 1 apple
+
+    2:
+      range: 25-99 # Kill range required for this reward
+      commands:
+        - "say %player% you died!" # Sends a message
+        - "give %player% minecraft:apple 2" # Gives 2 apples
+
+    3:
+      range: 100-1000 # Kill range required for this reward
+      commands:
+        - "say %player% you died!" # Sends a message
+        - "give %player% minecraft:apple 3" # Gives 3 apples
+
+  killer: # Commands executed for the killer
+
+    1:
+      range: 0-24 # Kill range required for this reward
+      commands:
+        - "say %player% you killed %victim%" # Sends a message
+        - "give %player% minecraft:gold_ingot 1" # Gives 1 gold ingot
+
+    2:
+      range: 25-99 # Kill range required for this reward
+      commands:
+        - "say %player% you killed %victim%" # Sends a message
+        - "give %player% minecraft:gold_ingot 2" # Gives 2 gold ingots
+
+    3:
+      range: 100-1000 # Kill range required for this reward
+      commands:
+        - "say %player% you killed %victim%" # Sends a message
+        - "give %player% minecraft:gold_ingot 3" # Gives 3 gold ingots
+
+death-reward: true # Enable or disable death rewards
+death-lightning: true # Strike lightning on player death
 
 leaderboard:
-  empty-name: "---"
-  empty-value: "0"
+  empty-name: "---" # Displayed name if leaderboard entry is empty
+  empty-value: "0" # Displayed value if leaderboard entry is empty
 
-update-checker: true
+update-checker: true # Check for plugin updates automatically
 
 database:
   type: SQLITE # SQLITE or MYSQL
+
   mysql:
-    host: localhost
-    port: 3306
-    database: amethyst
-    username: root
-    password: ""
+    host: localhost # MySQL host
+    port: 3306 # MySQL port
+    database: amethyst # Database name
+    username: root # Database username
+    password: "" # Database password
+
   sqlite:
-    file: data.db
+    file: data.db # SQLite database file name
